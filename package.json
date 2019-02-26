@@ -6,7 +6,7 @@
   "scripts": {
     "start": "next",
     "test": "yarn build",
-    "build": "cross-env-shell NODE_ENV=production next build && next export",
+    "build": "cross-env-shell NODE_ENV=production next build && next export && touch out/.nojekyll",
     "prettier": "prettier \"**/*.{js,json,css,md}\" --write"
   },
   "author": "",
