@@ -1,0 +1,32 @@
+{
+  "name": "message",
+  "version": "1.0.0",
+  "description": "Choir Genius text messaging service and app",
+  "main": "index.js",
+  "scripts": {
+    "start": "next",
+    "test": "yarn build",
+    "build": "cross-env-shell NODE_ENV=production next build && next export",
+    "prettier": "prettier \"**/*.{js,json,css,md}\" --write"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "awesome-phonenumber": "^2.5.0",
+    "aws-sdk": "^2.409.0",
+    "choirgenius": "^1.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "final-form": "^4.11.1",
+    "next": "^8.0.3",
+    "prettier": "^1.16.4",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "react-feather": "^1.1.6",
+    "react-final-form-hooks": "^1.0.0",
+    "rebass": "^3.0.1",
+    "rimble-ui": "^0.4.1",
+    "styled-components": "^4.1.3"
+  }
+}

@@ -1,0 +1,71 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: text-members # NOTE: update this with your service name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  profile: personal
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "sns:*"
+
+# you can overwrite defaults here
+#  stage: dev
+
+functions:
+  text-members:
+    handler: lambdas/handlers/textMembers.handler
+    timeout: 5
+    events:
+      - http:
+          path: members/text
+          method: post
+          cors: true
+    environment:
+      AUTH_TOKEN: ${env:AUTH_TOKEN}
+
+  update-members:
+    handler: lambdas/handlers/updateMembers.handler
+    timeout: 30
+    environment:
+      CHOIR_GENIUS_USERNAME: ${env:CHOIR_GENIUS_USERNAME}
+      CHOIR_GENIUS_PASSWORD: ${env:CHOIR_GENIUS_PASSWORD}
+#    events:
+#        - schedule: cron(0 1 * * ? *)
+
+resources:
+  Resources:
+    MembersTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-members
+    MenTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-men
+    WomenTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-women
+    BoardTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-board
