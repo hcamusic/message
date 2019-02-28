@@ -1,7 +1,10 @@
 const ChoirGenius = require('choirgenius');
 const AWS = require('aws-sdk');
 const PhoneNumber = require('awesome-phonenumber');
+const pDoWhilst = require('p-do-whilst');
+const { forEachSeries } = require('p-iteration');
 const snsRoleToTopicArns = require('../snsRoleToTopicArns');
+const _ = require('lodash');
 
 const sns = new AWS.SNS();
 const choirGenius = new ChoirGenius('https://hcamusic.org');
@@ -9,28 +12,114 @@ const choirGenius = new ChoirGenius('https://hcamusic.org');
 const username = process.env.CHOIR_GENIUS_USERNAME;
 const password = process.env.CHOIR_GENIUS_PASSWORD;
 
-// TODO: Update topic subscriptions
-module.exports.handler = async (event, context) => {
-  // await choirGenius.login(username, password);
-  //
-  // const members = await choirGenius.getMembers();
-  // const chorusMembers = members.filter(member =>
-  //   member.roles.includes('Member')
-  // );
+async function listSubscriptionsByTopic(arn) {
+  let subscriptions = [];
+  let nextToken;
 
-  // console.log(JSON.stringify(chorusMembers, null, 2));
+  await pDoWhilst(
+    async () => {
+      const params = { TopicArn: arn };
+
+      if (nextToken) {
+        params.NextToken = nextToken;
+      }
+
+      const result = await sns.listSubscriptionsByTopic(params).promise();
+
+      subscriptions = subscriptions.concat(result.Subscriptions);
+      nextToken = result.NextToken;
+    },
+    () => nextToken
+  );
+
+  return subscriptions;
+}
+
+async function getActionsByTopicArn(role, topicArn, chorusMembers) {
+  const subscriptions = await listSubscriptionsByTopic(topicArn);
+
+  const subscriptionEndpoints = _(subscriptions)
+    .map(subscription => ({
+      ...subscription,
+      Endpoint: new PhoneNumber(subscription.Endpoint).getNumber(
+        'international'
+      )
+    }))
+    .keyBy('Endpoint')
+    .value();
+
+  const expectedSubscriptions = _(chorusMembers)
+    .filter(member => member.roles.includes(role))
+    .map(member => member.endpoint)
+    .value();
+
+  const actualSubscriptions = _(subscriptionEndpoints)
+    .map(sub => sub.Endpoint)
+    .value();
+
+  const endpointsToAdd = _.difference(
+    expectedSubscriptions,
+    actualSubscriptions
+  );
+
+  const endpointsToRemove = _.difference(
+    actualSubscriptions,
+    expectedSubscriptions
+  );
+
+  console.log(
+    `${role}: Adding ${endpointsToAdd.length}, removing ${
+      endpointsToRemove.length
+    }`
+  );
+
+  return []
+    .concat(
+      endpointsToAdd.map(endpoint =>
+        sns.subscribe({
+          TopicArn: topicArn,
+          Protocol: 'sms',
+          Endpoint: endpoint
+        })
+      )
+    )
+    .concat(
+      endpointsToRemove.map(endpoint =>
+        sns.unsubscribe({
+          SubscriptionArn: subscriptionEndpoints[endpoint].SubscriptionArn
+        })
+      )
+    );
+}
+
+module.exports.handler = async () => {
+  await choirGenius.login(username, password);
+
+  const members = await choirGenius.getMembers();
+  const chorusMembers = _(members)
+    .filter(member => member.roles.includes('Member') && member.mobilePhone)
+    .map(member => ({
+      roles: member.roles,
+      endpoint: new PhoneNumber(member.mobilePhone, 'US').getNumber(
+        'international'
+      )
+    }))
+    .keyBy('endpoint')
+    .value();
+
+  console.log(`Processing ${Object.keys(chorusMembers).length} members`);
 
   const roleToTopicArn = await snsRoleToTopicArns(sns);
 
-  await sns
-    .subscribe({
-      TopicArn: roleToTopicArn['Member'],
-      Protocol: 'sms',
-      Endpoint: new PhoneNumber('(919) 426-8744', 'US').getNumber(
-        'international'
+  const actions = _.flatten(
+    await Promise.all(
+      _(roleToTopicArn).map((topicArn, role) =>
+        getActionsByTopicArn(role, topicArn, chorusMembers)
       )
-    })
-    .promise();
+    )
+  );
+
+  await forEachSeries(actions, action => action.promise());
 
   return {};
 };

@@ -42,7 +42,7 @@ module.exports.handler = async event => {
   await sns
     .publish({
       TopicArn: roleToTopicArn[data.role],
-      Message: data.message
+      Message: `HCA: ${data.message}`
     })
     .promise();
 

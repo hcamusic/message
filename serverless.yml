@@ -48,8 +48,8 @@ functions:
     environment:
       CHOIR_GENIUS_USERNAME: ${env:CHOIR_GENIUS_USERNAME}
       CHOIR_GENIUS_PASSWORD: ${env:CHOIR_GENIUS_PASSWORD}
-#    events:
-#        - schedule: cron(0 1 * * ? *)
+    events:
+        - schedule: rate(1 day)
 
 resources:
   Resources:
