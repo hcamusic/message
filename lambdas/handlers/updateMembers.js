@@ -99,6 +99,7 @@ module.exports.handler = async () => {
   const chorusMembers = _(members)
     .filter(member => member.roles.includes('Member') && member.mobilePhone)
     .map(member => ({
+      ...member,
       roles: member.roles,
       endpoint: new PhoneNumber(member.mobilePhone, 'US').getNumber(
         'international'

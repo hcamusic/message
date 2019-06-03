@@ -2,7 +2,8 @@ const topicToRole = {
   'hca-text-board': 'Board Member',
   'hca-text-members': 'Member',
   'hca-text-men': "Men's Ensemble",
-  'hca-text-women': 'Ladies'
+  'hca-text-women': 'Ladies',
+  'hca-text-communications': 'Communications'
 };
 
 module.exports = async sns => {

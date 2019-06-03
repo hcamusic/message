@@ -69,3 +69,7 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: hca-text-board
+    CommunicationsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-communications
