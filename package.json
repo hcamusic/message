@@ -32,6 +32,7 @@
     "react-final-form-hooks": "^1.0.0",
     "rebass": "^3.0.1",
     "rimble-ui": "^0.4.1",
+    "serverless": "^1.57.0",
     "styled-components": "^4.1.3"
   }
 }

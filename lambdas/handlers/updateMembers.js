@@ -62,15 +62,23 @@ async function getActionsByTopicArn(role, topicArn, chorusMembers) {
     actualSubscriptions
   );
 
+  const mapDisplayEndpoints = endpoint => {
+    const member = chorusMembers[endpoint] || {firstName: "", lastName: ""};
+
+    return `(${endpoint}) ${member.firstName} ${member.lastName}`;
+  };
+
   const endpointsToRemove = _.difference(
     actualSubscriptions,
     expectedSubscriptions
   );
 
+  const membersToAdd = endpointsToAdd.map(mapDisplayEndpoints).join("\n    ");
+  const membersToRemove = endpointsToRemove.map(mapDisplayEndpoints).join("\n    ");
+
   console.log(
-    `${role}: Adding ${endpointsToAdd.length}, removing ${
-      endpointsToRemove.length
-    }`
+    `${role}:\n  Adding ${endpointsToAdd.length}:\n    ${membersToAdd}` +
+    `\n  Removing ${endpointsToRemove.length}:\n    ${membersToRemove}`
   );
 
   return []

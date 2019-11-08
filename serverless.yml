@@ -19,8 +19,7 @@ service: text-members # NOTE: update this with your service name
 
 provider:
   name: aws
-  runtime: nodejs8.10
-  profile: personal
+  runtime: nodejs10.x
   iamRoleStatements:
     - Effect: "Allow"
       Resource: "*"
@@ -73,3 +72,7 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: hca-text-communications
+    BarlockTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: hca-text-barlock

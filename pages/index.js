@@ -27,7 +27,8 @@ const selectOptions = {
   Members: 'Member',
   Men: "Men's Ensemble",
   Women: 'Ladies',
-  Board: 'Board Member'
+  Board: 'Board Member',
+  Barlock: 'Barlock'
 };
 
 const selectItems = Object.keys(selectOptions);
