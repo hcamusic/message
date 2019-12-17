@@ -50,6 +50,7 @@ async function getActionsByTopicArn(role, topicArn, chorusMembers) {
 
   const expectedSubscriptions = _(chorusMembers)
     .filter(member => member.roles.includes(role))
+    .filter(member => !member.roles.includes("Inactive Member"))
     .map(member => member.endpoint)
     .value();
 
