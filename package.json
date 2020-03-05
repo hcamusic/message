@@ -16,7 +16,7 @@
   "dependencies": {
     "awesome-phonenumber": "^2.5.0",
     "aws-sdk": "^2.409.0",
-    "choirgenius": "^1.0.0",
+    "choirgenius": "^1.1.0",
     "lodash": "^4.17.11",
     "p-do-whilst": "^0.1.0",
     "p-iteration": "^1.1.7"
