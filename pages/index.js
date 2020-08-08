@@ -24,16 +24,16 @@ const StyledTextArea = styled(Textarea)`
 `;
 
 const selectOptions = {
-  Members: 'Member',
-  Men: "Men's Ensemble",
-  Women: "Women's Ensemble",
+  Members: 3,
+  Men: 12,
+  Women: 13,
   // Board: 'Board Member',
-  Barlock: 'Barlock'
+  Barlock: 'barlock'
 };
 
 const selectItems = Object.keys(selectOptions);
 
-const onSubmit = async ({ message, role, password }) => {
+const onSubmit = async ({ message, grouping, password }) => {
   const response = await fetch(
     'https://zktt9bzol4.execute-api.us-east-1.amazonaws.com/dev/members/text',
     {
@@ -44,7 +44,7 @@ const onSubmit = async ({ message, role, password }) => {
       }),
       body: JSON.stringify({
         message,
-        role: selectOptions[role],
+        grouping: selectOptions[grouping],
         auth: password
       })
     }

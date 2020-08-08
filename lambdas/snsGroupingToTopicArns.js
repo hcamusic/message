@@ -2,6 +2,7 @@ const topicToGrouping = {
   'hca-text-members': 3,
   'hca-text-men': 12,
   'hca-text-women': 13,
+  'hca-text-barlock': 'barlock'
 };
 
 module.exports = async sns => {

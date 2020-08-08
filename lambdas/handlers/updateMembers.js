@@ -119,11 +119,12 @@ module.exports.handler = async () => {
 
   const groupingToTopicArn = await snsGroupingToTopicArns(sns);
 
+  delete groupingToTopicArn['barlock']
+
   const actions = _.flatten(
     await Promise.all(
-      _(groupingToTopicArn).map((topicArn, grouping) =>
-        getActionsByTopicArn(grouping, topicArn)
-      )
+      _(groupingToTopicArn)
+        .map((topicArn, grouping) => getActionsByTopicArn(grouping, topicArn))
     )
   );
 

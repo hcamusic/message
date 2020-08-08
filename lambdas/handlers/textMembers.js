@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const snsRoleToTopicArns = require('../snsRoleToTopicArns');
+const snsGroupingToTopicArn = require('../snsGroupingToTopicArn');
 
 const sns = new AWS.SNS();
 
@@ -37,11 +37,11 @@ module.exports.handler = async event => {
     };
   }
 
-  const roleToTopicArn = await snsRoleToTopicArns(sns);
+  const grouping = await snsGroupingToTopicArn(sns);
 
   await sns
     .publish({
-      TopicArn: roleToTopicArn[data.role],
+      TopicArn: grouping[data.grouping],
       Message: `HCA: ${data.message}`
     })
     .promise();
