@@ -39,11 +39,15 @@ module.exports.handler = async event => {
 
   const grouping = await snsGroupingToTopicArn(sns);
 
+  const params = {
+    TopicArn: grouping[data.grouping],
+    Message: `HCA: ${data.message}`
+  }
+
+  console.log('Publishing to SNS', params)
+
   await sns
-    .publish({
-      TopicArn: grouping[data.grouping],
-      Message: `HCA: ${data.message}`
-    })
+    .publish(params)
     .promise();
 
   return {
