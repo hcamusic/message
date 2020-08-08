@@ -1,13 +1,13 @@
-const ChoirGenius = require('choirgenius');
+const HarmonySite = require('harmonysite');
 const AWS = require('aws-sdk');
 const PhoneNumber = require('awesome-phonenumber');
 const pDoWhilst = require('p-do-whilst');
 const { forEachSeries } = require('p-iteration');
-const snsRoleToTopicArns = require('../snsRoleToTopicArns');
+const snsGroupingToTopicArns = require('../snsGroupingToTopicArns');
 const _ = require('lodash');
 
 const sns = new AWS.SNS();
-const choirGenius = new ChoirGenius('https://hcamusic.org');
+const harmonysite = new HarmonySite('https://www.hcamusic.org');
 
 const username = process.env.CHOIR_GENIUS_USERNAME;
 const password = process.env.CHOIR_GENIUS_PASSWORD;
@@ -35,7 +35,22 @@ async function listSubscriptionsByTopic(arn) {
   return subscriptions;
 }
 
-async function getActionsByTopicArn(role, topicArn, chorusMembers) {
+async function getActionsByTopicArn(grouping, topicArn) {
+
+  const members = await harmonysite.members.list(grouping);
+  const chorusMembers = _(members)
+    .filter(member => member.cellPhone)
+    .map(member => ({
+      ...member,
+      endpoint: new PhoneNumber(member.cellPhone, 'US').getNumber(
+        'international'
+      )
+    }))
+    .keyBy('endpoint')
+    .value();
+
+  console.log(`Processing ${Object.keys(chorusMembers).length} members for ${topicArn}`);
+
   const subscriptions = await listSubscriptionsByTopic(topicArn);
 
   const subscriptionEndpoints = _(subscriptions)
@@ -49,8 +64,6 @@ async function getActionsByTopicArn(role, topicArn, chorusMembers) {
     .value();
 
   const expectedSubscriptions = _(chorusMembers)
-    .filter(member => member.roles.includes(role))
-    .filter(member => !member.roles.includes("Inactive Member"))
     .map(member => member.endpoint)
     .value();
 
@@ -78,7 +91,7 @@ async function getActionsByTopicArn(role, topicArn, chorusMembers) {
   const membersToRemove = endpointsToRemove.map(mapDisplayEndpoints).join("\n    ");
 
   console.log(
-    `${role}:\n  Adding ${endpointsToAdd.length}:\n    ${membersToAdd}` +
+    `${topicArn}:\n  Adding ${endpointsToAdd.length}:\n    ${membersToAdd}` +
     `\n  Removing ${endpointsToRemove.length}:\n    ${membersToRemove}`
   );
 
@@ -102,29 +115,14 @@ async function getActionsByTopicArn(role, topicArn, chorusMembers) {
 }
 
 module.exports.handler = async () => {
-  await choirGenius.login(username, password);
+  await harmonysite.login(username, password);
 
-  const members = await choirGenius.getMembers();
-  const chorusMembers = _(members)
-    .filter(member => member.roles.includes('Member') && member.mobilePhone)
-    .map(member => ({
-      ...member,
-      roles: member.roles,
-      endpoint: new PhoneNumber(member.mobilePhone, 'US').getNumber(
-        'international'
-      )
-    }))
-    .keyBy('endpoint')
-    .value();
-
-  console.log(`Processing ${Object.keys(chorusMembers).length} members`);
-
-  const roleToTopicArn = await snsRoleToTopicArns(sns);
+  const groupingToTopicArn = await snsGroupingToTopicArns(sns);
 
   const actions = _.flatten(
     await Promise.all(
-      _(roleToTopicArn).map((topicArn, role) =>
-        getActionsByTopicArn(role, topicArn, chorusMembers)
+      _(groupingToTopicArn).map((topicArn, grouping) =>
+        getActionsByTopicArn(grouping, topicArn)
       )
     )
   );

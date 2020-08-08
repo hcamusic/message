@@ -45,8 +45,8 @@ functions:
     handler: lambdas/handlers/updateMembers.handler
     timeout: 30
     environment:
-      CHOIR_GENIUS_USERNAME: ${env:CHOIR_GENIUS_USERNAME}
-      CHOIR_GENIUS_PASSWORD: ${env:CHOIR_GENIUS_PASSWORD}
+      HARMONYSITE_USERNAME: ${env:HARMONYSITE_USERNAME}
+      HARMONYSITE_PASSWORD: ${env:HARMONYSITE_PASSWORD}
     events:
         - schedule: rate(1 day)
 

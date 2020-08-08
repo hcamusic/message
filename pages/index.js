@@ -26,8 +26,8 @@ const StyledTextArea = styled(Textarea)`
 const selectOptions = {
   Members: 'Member',
   Men: "Men's Ensemble",
-  Women: 'Ladies',
-  Board: 'Board Member',
+  Women: "Women's Ensemble",
+  // Board: 'Board Member',
   Barlock: 'Barlock'
 };
 
