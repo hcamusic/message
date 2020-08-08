@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const snsGroupingToTopicArn = require('../snsGroupingToTopicArn');
+const snsGroupingToTopicArn = require('../snsGroupingToTopicArns');
 
 const sns = new AWS.SNS();
 
