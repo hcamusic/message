@@ -26,13 +26,13 @@ module.exports.handler = async event => {
     };
   }
 
-  if (!data.message || !data.role) {
+  if (!data.message || !data.grouping) {
     return {
       statusCode: 400,
       headers: responseHeaders,
       body: JSON.stringify({
         success: false,
-        error: 'No `body` or `role` provided'
+        error: 'No `body` or `grouping` provided'
       })
     };
   }

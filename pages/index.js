@@ -103,11 +103,11 @@ export default function() {
 
   const message = useField('message', form);
   const password = useField('password', form);
-  const role = useField('role', form);
+  const grouping = useField('grouping', form);
 
   useEffect(() => {
-    if (role.input.value === '' && Object.keys(role.meta).length > 0) {
-      role.input.onChange(selectItems[0]);
+    if (grouping.input.value === '' && Object.keys(grouping.meta).length > 0) {
+      grouping.input.onChange(selectItems[0]);
     }
   });
 
@@ -154,7 +154,7 @@ export default function() {
 
           <Flex justifyContent="space-between" mb="3">
             <Field label="What Group" mb="3">
-              <Select {...role.input} items={selectItems} />
+              <Select {...grouping.input} items={selectItems} />
             </Field>
             <Box pt={4}>
               <Button
